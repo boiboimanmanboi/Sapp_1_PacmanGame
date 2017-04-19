@@ -1,0 +1,196 @@
+package sapp_1_pacmangame;
+
+
+import static java.lang.System.gc;
+import java.util.ArrayList;
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+public class Sapp_1_PacmanGame extends Application {
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
+    static ArrayList<String> input = new ArrayList<String>();
+    //static ArrayList<Wall> walls = new ArrayList();
+    static Wall [] walls = new Wall[10];
+    static Group g = new Group();
+    static Scene scene = new Scene(g, 600, 600,Color.BLACK);
+    static Hero pacman;
+    
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Pacman");
+
+        
+
+        pacman = new Hero(0, 300);
+        pacman.setFill(Color.YELLOW);
+        AnimationTimer timer = new MyTimer();
+        
+        for(int i=0; i<10; i++){
+            walls[i] = new Wall(i + 50, i + 50);
+        }
+        
+
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                String code = event.getCode().toString();
+                if (event.getCode() == KeyCode.RIGHT) {
+                    pacman.setCenterX(pacman.getCenterX() + 5);
+                    checkBounds();
+                    pacman.right = true;
+                    pacman.left = false;
+                    pacman.up = false;
+                    pacman.down = false;
+                    pacman.setStartAngle(45.0f);
+                } else if (event.getCode() == KeyCode.LEFT) {
+                    pacman.setCenterX(pacman.getCenterX() - 5);
+                    checkBounds();
+                    pacman.right = false;
+                    pacman.left = true;
+                    pacman.up = false;
+                    pacman.down = false;
+                    pacman.setStartAngle(225.0f);
+                } else if (event.getCode() == KeyCode.UP) {
+                    pacman.setCenterY(pacman.getCenterY() - 5);
+                    checkBounds();
+                    pacman.right = false;
+                    pacman.left = false;
+                    pacman.up = true;
+                    pacman.down = false;
+                    pacman.setStartAngle(135.0f);
+                } else if (event.getCode() == KeyCode.DOWN) {
+                    pacman.setCenterY(pacman.getCenterY() + 5);
+                    checkBounds();
+                    pacman.right = false;
+                    pacman.left = false;
+                    pacman.up = false;
+                    pacman.down = true;
+                    pacman.setStartAngle(315.0f);
+                }
+            }
+        });
+
+        scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT) {
+                }
+            }
+        });
+        
+        g.getChildren().add(pacman);
+
+        
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        
+        
+        timer.start();
+    }
+
+
+static class Hero extends Arc{
+
+        boolean right = false;
+        boolean left = false;
+        boolean up = false;
+        boolean down = false;
+
+        public Hero(int x, int y) {
+            this.getCenterX();
+            this.getCenterY();
+            this.setCenterX(50.0f);
+            this.setCenterY(50.0f);
+            this.setFill(Color.YELLOW);
+            this.setRadiusX(25.0f);
+            this.setRadiusY(25.0f);
+            this.setStartAngle(45.0f);
+            this.setLength(270.0f);
+            this.setType(ArcType.ROUND);
+        }
+    
+}
+
+class Wall extends Rectangle{
+    public Wall(int x, int y) {
+        this.getX();
+        this.getY();
+        this.setX(200);
+        this.setY(200);
+        this.setFill(Color.BLUE);
+        this.setWidth(50);
+        this.setHeight(50);
+        g.getChildren().add(this);
+    }
+}
+
+private void checkBounds() {
+    for (Rectangle Wall : walls){
+        if(pacman.getBoundsInParent().intersects(Wall.getBoundsInParent()) && pacman.left == true){
+            pacman.setCenterX(pacman.getCenterX() + 15);
+            pacman.left = false;
+        }
+    }
+    for (Rectangle Wall : walls){
+        if(pacman.getBoundsInParent().intersects(Wall.getBoundsInParent()) && pacman.right == true){
+            pacman.setCenterX(pacman.getCenterX() - 15);
+            pacman.right = false;
+        }
+    }
+    for (Rectangle Wall : walls){
+        if(pacman.getBoundsInParent().intersects(Wall.getBoundsInParent()) && pacman.up == true){
+            pacman.setCenterY(pacman.getCenterY() + 15);
+            pacman.up = false;
+        }
+    }
+    for (Rectangle Wall : walls){
+        if(pacman.getBoundsInParent().intersects(Wall.getBoundsInParent()) && pacman.down == true){
+            pacman.setCenterY(pacman.getCenterY() - 15);
+            pacman.down = false;
+        }
+    }
+}
+
+private class MyTimer extends AnimationTimer {
+    @Override
+        public void handle(long now) {
+            if (input.contains("LEFT")) {
+                pacman.setCenterX(pacman.getCenterX() - 75);
+            }
+            doHandle();
+        }
+        private void doHandle() {
+            checkBounds();
+            System.out.println("working");
+            if(pacman.right){
+                pacman.setCenterX(pacman.getCenterX() + 5);
+            }
+            if(pacman.left){
+                pacman.setCenterX(pacman.getCenterX() - 5);
+            }
+            if(pacman.up){
+                pacman.setCenterY(pacman.getCenterY() - 5);
+            }
+            if(pacman.down){
+                pacman.setCenterY(pacman.getCenterY() + 5);
+            }
+            pacman.setLength(270.0f);
+            pacman.setLength(315.0f);
+            pacman.setLength(360.0f);
+        }
+}
+
+}
